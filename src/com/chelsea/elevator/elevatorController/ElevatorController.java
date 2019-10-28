@@ -15,12 +15,13 @@ public class ElevatorController extends Thread {
     public void run() {
         System.out.println("Inside : " + Thread.currentThread().getName());
         while (true) {
+            int nextStop = elevator.goToNextStop();
+
             try {
                 Thread.sleep(1000);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-            int nextStop = elevator.goToNextStop();
             System.out.println("at level: " + nextStop);
         }
     }

@@ -7,6 +7,7 @@ import com.chelsea.elevator.request.ExternalRequest;
 import com.chelsea.elevator.request.InternalRequest;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.PriorityQueue;
 
@@ -15,7 +16,7 @@ public class Elevator {
     private PriorityQueue<Integer> upStops = new PriorityQueue<>();
     private PriorityQueue<Integer> downStops = new PriorityQueue<>((x, y) -> y - x);
     private int currentLevel;
-    private ElevatorStatus status;
+    private ElevatorStatus status = ElevatorStatus.UP;
     private boolean isGateOpen;
     private float weightLimit;
     private int numOfFloors;
@@ -37,6 +38,8 @@ public class Elevator {
 
     public void handleInternalRequest(InternalRequest r) {
         int destinationLevel = r.getFloorNumber();
+        System.out.println("cuur level is: " + currentLevel + " destinationLevel is: " + destinationLevel);
+
         if (destinationLevel > currentLevel) {
             upStops.add(destinationLevel);
         } else if (destinationLevel < currentLevel) {
@@ -58,41 +61,40 @@ public class Elevator {
         if (status == ElevatorStatus.UP) {
             if (upStops.size() > 0) {
                 nextLevel = upStops.poll();
-                currentLevel = nextLevel;
             } else {
                 if (downStops.size() > 0) {
                     status = ElevatorStatus.DOWN;
                     nextLevel = downStops.poll();
-                    currentLevel = nextLevel;
                 }
             }
         } else if (status == ElevatorStatus.DOWN) {
             if (downStops.size() > 0) {
                 nextLevel = downStops.poll();
-                currentLevel = nextLevel;
             } else {
                 if (upStops.size() > 0) {
                     status = ElevatorStatus.UP;
                     nextLevel = upStops.poll();
-                    currentLevel = nextLevel;
                 }
             }
         } else {
             if (upStops.size() > 0) {
                 status = ElevatorStatus.UP;
                 nextLevel = upStops.poll();
-                currentLevel = nextLevel;
             } else if (downStops.size() > 0) {
                 status = ElevatorStatus.DOWN;
                 nextLevel = downStops.poll();
-                currentLevel = nextLevel;
             }
         }
 
         // if idle and no requests
         if (nextLevel == 0) {
             status = ElevatorStatus.IDLE;
+            openGate();
+            return currentLevel;
         }
+
+        currentLevel = nextLevel;
+        System.out.println("current-level: " + currentLevel);
         openGate();
         return nextLevel;
     }
@@ -107,4 +109,13 @@ public class Elevator {
         }
         return true;
     }
+
+    public void printUpQueue() {
+        System.out.println("upQueue is: " + Arrays.toString(upStops.toArray()));
+    }
+
+    public void printDownQueue() {
+        System.out.println("downQueue is: " +  Arrays.toString(downStops.toArray()));
+    }
+
 }
